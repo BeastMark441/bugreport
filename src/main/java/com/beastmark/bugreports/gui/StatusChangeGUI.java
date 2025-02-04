@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StatusChangeGUI extends GUI {
     private final List<Report> reports;
@@ -57,9 +58,13 @@ public class StatusChangeGUI extends GUI {
     }
 
     private void changeStatus(String newStatus) {
-        if (!statuses.contains(newStatus)) {
+        List<String> configStatuses = BugReports.getInstance().getConfig().getStringList("statuses");
+        
+        if (!configStatuses.contains(newStatus)) {
+            String availableStatuses = configStatuses.stream()
+                .collect(Collectors.joining(", "));
             player.sendMessage(MessageManager.getMessage("invalid-status", 
-                "%statuses%", String.join(", ", statuses)));
+                "%statuses%", availableStatuses));
             return;
         }
 
@@ -67,8 +72,7 @@ public class StatusChangeGUI extends GUI {
         for (Report report : reports) {
             String oldStatus = report.getStatus();
             if (!oldStatus.equals(newStatus)) {
-                report.setStatus(newStatus);
-                BugReports.getInstance().getDatabaseManager().updateReport(report);
+                BugReports.getInstance().getDatabaseManager().updateReportStatus(report.getId(), newStatus);
                 
                 // Уведомляем игрока об изменении статуса
                 Player target = BugReports.getInstance().getServer().getPlayer(report.getPlayerUUID());
@@ -84,6 +88,9 @@ public class StatusChangeGUI extends GUI {
         player.sendMessage(MessageManager.getMessage("reports-status-updated", 
             "%count%", String.valueOf(count)));
         player.closeInventory();
+        
+        // Открываем админ GUI после изменения статуса
+        new AdminGUI(player).open();
     }
 
     private Material getStatusMaterial(String status) {

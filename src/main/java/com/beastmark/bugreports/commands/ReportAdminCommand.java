@@ -10,6 +10,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class ReportAdminCommand implements CommandExecutor {
     private final BugReports plugin;
 
@@ -45,9 +47,11 @@ public class ReportAdminCommand implements CommandExecutor {
                 }
                 try {
                     int id = Integer.parseInt(args[1]);
-                    String status = args[2];
-                    if (!BugReports.getInstance().getConfig().getStringList("statuses").contains(status)) {
-                        sender.sendMessage(MessageManager.getMessage("invalid-status"));
+                    String status = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length));
+                    List<String> availableStatuses = BugReports.getInstance().getConfig().getStringList("statuses");
+                    if (!availableStatuses.contains(status)) {
+                        sender.sendMessage(MessageManager.getMessage("invalid-status",
+                            "%statuses%", String.join(", ", availableStatuses)));
                         return true;
                     }
                     updateStatus(sender, id, status);
