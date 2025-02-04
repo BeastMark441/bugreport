@@ -14,6 +14,7 @@ import com.beastmark.bugreports.listeners.ChatListener;
 import com.beastmark.bugreports.listeners.PlayerListener;
 import com.beastmark.bugreports.listeners.AdminChatListener;
 import com.beastmark.bugreports.utils.NotificationManager;
+import com.beastmark.bugreports.utils.UpdateChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -48,7 +49,7 @@ public class BugReports extends JavaPlugin {
         registerListeners();
         
         // Проверка обновлений
-        if (getConfig().getBoolean("check-updates", true)) {
+        if (getConfig().getBoolean("updates.enabled", true)) {
             new UpdateChecker(this);
         }
         
