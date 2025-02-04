@@ -1,0 +1,44 @@
+name: BugReports
+version: '${project.version}'
+main: com.beastmark.bugreports.BugReports
+api-version: '1.19'
+depend: [PlaceholderAPI]
+authors: [beastmark]
+description: Плагин для управления баг-репортами и предложениями
+website: https://vk.com/defaltmark
+
+commands:
+  bugreport:
+    description: Создать баг-репорт или посмотреть свои репорты
+    usage: /<command> [status]
+    aliases: [br, bug]
+    permission: bugreports.create
+  suggestion:
+    description: Создать предложение по улучшению
+    usage: /<command>
+    aliases: [suggest]
+    permission: bugreports.create
+  reportstats:
+    description: Открыть GUI со статистикой репортов
+    usage: /<command>
+    aliases: [rstats]
+    permission: bugreports.create
+  reportadmin:
+    description: Команды администратора
+    usage: |
+      /<command> gui - Открыть GUI управления
+      /<command> status <id> <статус> - Изменить статус
+      /<command> delete <id> - Удалить репорт
+      /<command> blacklist <player> - Добавить в черный список
+      /<command> reload - Перезагрузить конфиг
+    aliases: [ra, radmin]
+    permission: bugreports.admin
+    permission-message: "&cУ вас нет доступа к этой команде!"
+
+permissions:
+  bugreports.create:
+    description: Разрешает создавать репорты
+    default: true
+  bugreports.admin:
+    description: Доступ к админ-командам
+    default: op 

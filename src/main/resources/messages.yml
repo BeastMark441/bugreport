@@ -1,0 +1,61 @@
+prefix: "&8[&6BugReports&8]"
+
+messages:
+  player-only: "&cЭта команда доступна только для игроков!"
+  no-permission: "&cУ вас нет прав для использования этой команды!"
+  blacklisted: "&cВы находитесь в черном списке!"
+  no-reports: "&cУ вас нет активных репортов."
+  your-reports-header: "&6Ваши репорты:"
+  report-list-format: "&7#%id% - %type% (%status%)"
+  enter-description: "&7Введите описание в чат или напишите 'cancel' для отмены"
+  report-cancelled: "&cСоздание репорта отменено."
+  too-short: "&cОписание слишком короткое! Минимум %min% символов."
+  too-long: "&cОписание слишком длинное! Максимум %max% символов."
+  report-created: "&aРепорт #%id% успешно создан!"
+  invalid-args: "&cНеверные аргументы команды!"
+  report-not-found: "&cРепорт не найден!"
+  status-changed: "&aСтатус репорта #%id% изменен на %status%"
+  invalid-id: "&cНеверный ID репорта!"
+  report-deleted: "&aРепорт #%id% удален!"
+  player-not-found: "&cИгрок не найден!"
+  player-blacklisted: "&aИгрок %player% добавлен в черный список!"
+  config-reloaded: "&aКонфигурация перезагружена!"
+  admin-help: |
+    &6BugReports Admin Help:
+    &7/reportadmin gui &f- Открыть GUI управления
+    &7/reportadmin status <id> <статус> &f- Изменить статус
+    &7/reportadmin delete <id> &f- Удалить репорт
+    &7/reportadmin blacklist <player> &f- Добавить в черный список
+    &7/reportadmin unblacklist <player> &f- Удалить из черного списка
+    &7/reportadmin reload &f- Перезагрузить конфиг
+  report-status-changed: "&aСтатус вашего репорта #%id% изменен на: &f%status%"
+  new-reports-available: "&6У вас есть обновления по вашим репортам! &7(/bugreport status)"
+  new-reports-admin: "&6Новые репорты ожидают рассмотрения! &7(/reportadmin gui)"
+  report-notification: |
+    &8&m                                                    &r
+    &6Статус вашего репорта обновлен!
+    &7ID: &f#%id%
+    &7Новый статус: &f%status%
+    &7Тип: &f%type%
+    &8&m                                                    &r
+  report-updates-header: "&6=== Обновления по вашим репортам ==="
+  report-notification-format: "&7[#%id%] &f%type% &8- &a%status%"
+  click-to-view: "&7Нажмите, чтобы просмотреть детали"
+  reports-deleted: "&aУдалено репортов: &f%count%"
+  reports-status-updated: "&aСтатус обновлен для &f%count% &aрепортов"
+  no-reports-filtered: "&cНет репортов с текущим фильтром"
+  invalid-status: "&cНеверный статус! Доступные статусы: %statuses%"
+  player-unblacklisted: "&aИгрок %player% удален из черного списка!"
+  player-help: |
+    &6BugReports Help:
+    &7/bugreport &f- Создать баг-репорт
+    &7/bugreport status &f- Посмотреть статусы репортов
+    &7/bugreport list &f- Список всех ваших репортов
+    &7/suggestion &f- Создать предложение
+  no-reports-found: "&cУ вас пока нет репортов"
+  teleported-to-player: "&aВы телепортированы к игроку %player%"
+  player-offline: "&cИгрок не в сети!"
+  enter-message-to-player: "&aВведите сообщение для игрока %player%"
+  all-reports-deleted: "&aВсе репорты были удалены!"
+  filtered-reports-deleted: "&aУдалено %count% отфильтрованных репортов!"
+  message-sent: "&aСообщение отправлено игроку %player%!" 
