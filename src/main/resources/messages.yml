@@ -58,4 +58,11 @@ messages:
   enter-message-to-player: "&aВведите сообщение для игрока %player%"
   all-reports-deleted: "&aВсе репорты были удалены!"
   filtered-reports-deleted: "&aУдалено %count% отфильтрованных репортов!"
-  message-sent: "&aСообщение отправлено игроку %player%!" 
+  message-sent: "&aСообщение отправлено игроку %player%!"
+  update-available: |
+    &8&m                                                    &r
+    &6Доступно обновление BugReports!
+    &7Текущая версия: &f%current_version%
+    &7Новая версия: &f%new_version%
+    &7Скачать: &fhttps://github.com/BeastMark441/bugreport/releases/latest
+    &8&m                                                    &r 

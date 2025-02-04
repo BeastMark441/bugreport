@@ -47,6 +47,11 @@ public class BugReports extends JavaPlugin {
         registerCommands();
         registerListeners();
         
+        // Проверка обновлений
+        if (getConfig().getBoolean("check-updates", true)) {
+            new UpdateChecker(this);
+        }
+        
         // Регистрация PlaceholderAPI
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new BugReportsExpansion(this).register();
