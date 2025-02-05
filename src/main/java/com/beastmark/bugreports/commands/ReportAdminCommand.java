@@ -115,6 +115,17 @@ public class ReportAdminCommand implements CommandExecutor {
                 sender.sendMessage(MessageManager.getMessage("config-reloaded"));
                 break;
 
+            case "telegram":
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(MessageManager.getMessage("player-only"));
+                    return true;
+                }
+                Player player = (Player) sender;
+                String code = plugin.getTelegramManager().generateVerificationCode(player.getUniqueId());
+                player.sendMessage(MessageManager.getMessage("telegram-code", 
+                    "%code%", code));
+                break;
+
             default:
                 sendHelp(sender);
                 break;

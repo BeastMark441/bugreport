@@ -81,4 +81,32 @@ updates:
   # Показывать сообщение о текущей версии при запуске
   show-version-info: true
   # Интервал проверки обновлений (в часах)
-  check-interval: 24 
+  check-interval: 24
+
+# Настройки Telegram
+telegram:
+  # Включить/выключить интеграцию с Telegram
+  enabled: false
+  # Токен бота (получите у @BotFather)
+  bot-token: ""
+  # Имя бота
+  bot-username: "BugReportsBot"
+  # Уведомлять администраторов о новых репортах
+  notify-admins: true
+  # Настройки уведомлений
+  notifications:
+    # Отправлять уведомления о новых репортах
+    new-reports: true
+    # Отправлять уведомления об изменении статуса
+    status-changes: true
+    # Отправлять уведомления о новых сообщениях
+    new-messages: true
+  # Настройки безопасности
+  security:
+    # Время действия кода подтверждения (в минутах)
+    verification-code-timeout: 5
+    # Максимальное количество попыток ввода кода
+    max-verification-attempts: 3
+  # Привязанные аккаунты администраторов
+  # Формат: chat_id: minecraft_uuid
+  linked-accounts: {} 

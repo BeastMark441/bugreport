@@ -6,6 +6,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class MessageManager {
     private static FileConfiguration messages;
@@ -13,10 +15,34 @@ public class MessageManager {
 
     public static void load() {
         File file = new File(BugReports.getInstance().getDataFolder(), "messages.yml");
+        
+        // Сохраняем дефолтный файл, если его нет
         if (!file.exists()) {
             BugReports.getInstance().saveResource("messages.yml", false);
+        } else {
+            // Проверяем и добавляем новые сообщения
+            FileConfiguration defaultMessages = YamlConfiguration.loadConfiguration(
+                new InputStreamReader(BugReports.getInstance().getResource("messages.yml")));
+            messages = YamlConfiguration.loadConfiguration(file);
+            
+            boolean needsSave = false;
+            for (String key : defaultMessages.getKeys(true)) {
+                if (!messages.contains(key)) {
+                    messages.set(key, defaultMessages.get(key));
+                    needsSave = true;
+                }
+            }
+            
+            if (needsSave) {
+                try {
+                    messages.save(file);
+                    BugReports.getInstance().getLogger().info("Файл messages.yml обновлен новыми сообщениями");
+                } catch (IOException e) {
+                    BugReports.getInstance().getLogger().severe("Ошибка при сохранении messages.yml: " + e.getMessage());
+                }
+            }
         }
-        messages = YamlConfiguration.loadConfiguration(file);
+        
         prefix = color(messages.getString("prefix", "&8[&6BugReports&8]"));
     }
 

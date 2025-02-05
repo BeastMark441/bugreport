@@ -10,6 +10,7 @@ import java.util.*;
 
 public class NotificationManager {
     private static final Map<UUID, Set<Integer>> pendingNotifications = new HashMap<>();
+    private static final Map<UUID, List<String>> pendingMessages = new HashMap<>();
     private static final Set<UUID> newReportsForAdmin = new HashSet<>();
     private final BugReports plugin;
 
@@ -44,7 +45,18 @@ public class NotificationManager {
         }
     }
 
+    public void addMessageNotification(UUID playerId, String message) {
+        pendingMessages.computeIfAbsent(playerId, k -> new ArrayList<>()).add(message);
+        
+        // Если игрок онлайн, сразу отправляем сообщение
+        Player player = Bukkit.getPlayer(playerId);
+        if (player != null && player.isOnline()) {
+            sendPendingMessages(player);
+        }
+    }
+
     public void sendNotification(Player player) {
+        // Отправляем обычные уведомления
         Set<Integer> reports = pendingNotifications.get(player.getUniqueId());
         if (reports != null && !reports.isEmpty()) {
             player.sendMessage(MessageManager.getMessage("report-updates-header"));
@@ -60,10 +72,9 @@ public class NotificationManager {
                             "%type%", report.getType().name().equals("BUG") ? "Баг" : "Предложение")
                     );
                     
-                    // Добавляем подсказку и команду при клике
                     message.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
                         net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                        new net.md_5.bungee.api.chat.ComponentBuilder("Нажмите, чтобы открыть статус репортов")
+                        new net.md_5.bungee.api.chat.ComponentBuilder(MessageManager.getMessage("click-to-view"))
                             .create()
                     ));
                     message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
@@ -76,6 +87,18 @@ public class NotificationManager {
             }
             
             pendingNotifications.remove(player.getUniqueId());
+            playNotificationSound(player);
+        }
+
+        // Отправляем накопленные сообщения
+        sendPendingMessages(player);
+    }
+
+    public void sendMessageToPlayer(UUID playerId, String message) {
+        Player player = Bukkit.getPlayer(playerId);
+        if (player != null && player.isOnline()) {
+            player.sendMessage(MessageManager.getPrefix() + " " + message);
+            playNotificationSound(player);
         }
     }
 
@@ -103,5 +126,17 @@ public class NotificationManager {
     private void saveOfflineNotification(UUID playerId, int reportId) {
         // Можно добавить сохранение в базу данных для оффлайн игроков
         // Или использовать файл для хранения
+    }
+
+    private void sendPendingMessages(Player player) {
+        List<String> messages = pendingMessages.get(player.getUniqueId());
+        if (messages != null && !messages.isEmpty()) {
+            player.sendMessage(MessageManager.getMessage("messages-header"));
+            for (String message : messages) {
+                player.sendMessage(MessageManager.getPrefix() + " " + message);
+            }
+            playNotificationSound(player);
+            pendingMessages.remove(player.getUniqueId());
+        }
     }
 } 

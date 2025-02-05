@@ -6,7 +6,7 @@
 
     <groupId>com.beastmark</groupId>
     <artifactId>bugreports</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>BugReports</name>
@@ -76,6 +76,11 @@
             <artifactId>placeholderapi</artifactId>
             <version>2.11.5</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots</artifactId>
+            <version>6.9.7.1</version>
         </dependency>
     </dependencies>
 </project> 

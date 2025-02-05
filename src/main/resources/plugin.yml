@@ -1,10 +1,11 @@
 name: BugReports
-version: '1.0.1'
+version: '1.1.0'
 main: com.beastmark.bugreports.BugReports
 api-version: '1.19'
 depend: [PlaceholderAPI]
+softdepend: []
 authors: [BeastMark]
-description: Плагин для управления баг-репортами и предложениями
+description: Плагин для управления баг-репортами и предложениями с поддержкой Telegram
 website: https://vk.com/defaltmark
 
 commands:
@@ -24,6 +25,10 @@ commands:
     description: Статистика репортов
     usage: /reportstats
     aliases: [rs]
+  telegram:
+    description: Управление Telegram интеграцией
+    usage: /telegram
+    aliases: [tg]
 
 permissions:
   bugreports.create:
@@ -31,4 +36,7 @@ permissions:
     default: true
   bugreports.admin:
     description: Доступ к админ-командам
+    default: op
+  bugreports.telegram:
+    description: Доступ к Telegram интеграции
     default: op 

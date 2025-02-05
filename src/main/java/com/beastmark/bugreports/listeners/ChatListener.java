@@ -64,5 +64,12 @@ public class ChatListener implements Listener {
         
         player.sendMessage(MessageManager.getMessage("report-created", 
             "%id%", String.valueOf(report.getId())));
+
+        if (plugin.getTelegramManager() != null && 
+            plugin.getConfig().getBoolean("telegram.notifications.new-reports", true)) {
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                plugin.getTelegramManager().notifyAdminsNewReport(report);
+            });
+        }
     }
 } 

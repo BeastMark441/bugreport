@@ -65,4 +65,21 @@ messages:
     &7Текущая версия: &f%current_version%
     &7Новая версия: &f%new_version%
     &7Скачать: &fhttps://github.com/BeastMark441/bugreport/releases/latest
-    &8&m                                                    &r 
+    &8&m                                                    &r
+
+  # Telegram сообщения
+  telegram-code: "&aВаш код для привязки Telegram: &f%code%\n&7Используйте его в боте в течение 5 минут."
+  telegram-linked: "&aВаш Telegram аккаунт успешно привязан!"
+  telegram-unlinked: "&cВаш Telegram аккаунт отвязан."
+  telegram-not-enabled: "&cИнтеграция с Telegram отключена в конфигурации."
+  telegram-already-linked: "&cЭтот Telegram аккаунт уже привязан к другому игроку."
+  telegram-help: |
+    &6Telegram команды:
+    &7/telegram link &f- Получить код для привязки
+    &7/telegram unlink &f- Отвязать аккаунт
+    &7/telegram status &f- Проверить статус привязки
+  telegram-status-linked: "&aВаш Telegram аккаунт привязан!"
+  telegram-status-not-linked: "&cВаш Telegram аккаунт не привязан."
+  telegram-new-report: "&9[Telegram] &fНовый %type% от игрока %player%: #%id%"
+  telegram-status-changed: "&9[Telegram] &fСтатус репорта #%id% изменен на: %status%"
+  messages-header: "&6=== Сообщения от администрации ===" 

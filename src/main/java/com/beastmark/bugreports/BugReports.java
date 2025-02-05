@@ -9,12 +9,14 @@ import com.beastmark.bugreports.commands.SuggestionCommand;
 import com.beastmark.bugreports.commands.ReportAdminCommand;
 import com.beastmark.bugreports.commands.ReportAdminTabCompleter;
 import com.beastmark.bugreports.commands.ReportStatsCommand;
+import com.beastmark.bugreports.commands.TelegramCommand;
 import com.beastmark.bugreports.listeners.GUIListener;
 import com.beastmark.bugreports.listeners.ChatListener;
 import com.beastmark.bugreports.listeners.PlayerListener;
 import com.beastmark.bugreports.listeners.AdminChatListener;
 import com.beastmark.bugreports.utils.NotificationManager;
 import com.beastmark.bugreports.utils.UpdateChecker;
+import com.beastmark.bugreports.telegram.TelegramManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -30,6 +32,7 @@ public class BugReports extends JavaPlugin {
     private static BugReports instance;
     private DatabaseManager databaseManager;
     private NotificationManager notificationManager;
+    private TelegramManager telegramManager;
     
     @Override
     public void onEnable() {
@@ -38,11 +41,18 @@ public class BugReports extends JavaPlugin {
         // Создаем бэкапы и загружаем конфигурацию
         createConfigBackups();
         saveDefaultConfig();
+        getConfig().options().copyDefaults(true);
+        saveConfig();
         
         // Инициализация менеджеров
         MessageManager.load();
         initDatabase();
         notificationManager = new NotificationManager(this);
+        
+        // Инициализация Telegram бота
+        if (getConfig().getBoolean("telegram.enabled", false)) {
+            telegramManager = new TelegramManager(this);
+        }
         
         // Регистрация команд и слушателей
         registerCommands();
@@ -82,6 +92,7 @@ public class BugReports extends JavaPlugin {
         getCommand("bugreport").setExecutor(new BugReportCommand(this));
         getCommand("suggestion").setExecutor(new SuggestionCommand(this));
         getCommand("reportstats").setExecutor(new ReportStatsCommand(this));
+        getCommand("telegram").setExecutor(new TelegramCommand(this));
     }
     
     private void registerListeners() {
@@ -136,5 +147,9 @@ public class BugReports extends JavaPlugin {
     
     public NotificationManager getNotificationManager() {
         return notificationManager;
+    }
+    
+    public TelegramManager getTelegramManager() {
+        return telegramManager;
     }
 } 
