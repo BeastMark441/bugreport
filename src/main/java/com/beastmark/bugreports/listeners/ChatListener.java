@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import io.papermc.paper.event.player.AsyncChatEvent;
 
 public class ChatListener implements Listener {
     private final BugReports plugin;
@@ -19,7 +19,7 @@ public class ChatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
+    public void onPlayerChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
         ReportCreationState state = ReportCreationManager.getPlayerState(player);
         
@@ -28,7 +28,7 @@ public class ChatListener implements Listener {
         }
 
         event.setCancelled(true);
-        String description = event.getMessage();
+        String description = event.message().toString();
 
         if (description.equalsIgnoreCase("cancel")) {
             ReportCreationManager.removePlayerState(player);

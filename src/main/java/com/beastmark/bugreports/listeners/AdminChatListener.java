@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
@@ -21,13 +20,13 @@ public class AdminChatListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
+    public void onPlayerChat(io.papermc.paper.event.player.AsyncChatEvent event) {
         Player admin = event.getPlayer();
         Player target = playersInMessageMode.get(admin.getUniqueId());
 
         if (target != null) {
             event.setCancelled(true);
-            String message = event.getMessage();
+            String message = event.message().toString();
 
             if (message.equalsIgnoreCase("cancel")) {
                 playersInMessageMode.remove(admin.getUniqueId());

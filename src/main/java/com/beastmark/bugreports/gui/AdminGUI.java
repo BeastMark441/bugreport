@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.Event.Result;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -26,8 +25,14 @@ public class AdminGUI extends GUI {
 
     public AdminGUI(Player player) {
         super(player, "Управление репортами", 54);
-        this.reports = BugReports.getInstance().getDatabaseManager().getAllReports();
+        this.reports = new ArrayList<>();
+        updateReports();
         init();
+    }
+
+    private void updateReports() {
+        reports.clear();
+        reports.addAll(BugReports.getInstance().getDatabaseManager().getAllReports());
     }
 
     @Override
@@ -259,8 +264,8 @@ public class AdminGUI extends GUI {
         else if (slot == 52) { // Очистка
             if (event.isShiftClick()) {
                 int count = reports.size();
-                reports.clear();
                 BugReports.getInstance().getDatabaseManager().deleteAllReports();
+                reports.clear(); // Очищаем существующий список
                 player.sendMessage(MessageManager.getMessage("reports-deleted", 
                     "%count%", String.valueOf(count)));
                 init();
@@ -273,7 +278,7 @@ public class AdminGUI extends GUI {
                     BugReports.getInstance().getDatabaseManager().deleteReport(report.getId());
                 }
                 
-                reports.removeAll(toDelete);
+                updateReports(); // Обновляем список после массового удаления
                 player.sendMessage(MessageManager.getMessage("reports-deleted", 
                     "%count%", String.valueOf(toDelete.size())));
                 init();
@@ -281,8 +286,9 @@ public class AdminGUI extends GUI {
         }
         else if (slot < 45 && slot >= 0) {
             int reportIndex = currentPage * 45 + slot;
-            if (reportIndex < reports.size()) {
-                Report report = reports.get(reportIndex);
+            List<Report> filteredReports = filterAndSortReports();
+            if (reportIndex < filteredReports.size()) {
+                Report report = filteredReports.get(reportIndex);
                 if (event.isLeftClick()) {
                     if (event.isShiftClick()) {
                         // Телепортация к игроку
@@ -324,14 +330,6 @@ public class AdminGUI extends GUI {
         } else if (slot == 53 && (currentPage + 1) * 45 < reports.size()) {
             currentPage++;
             init();
-        }
-    }
-
-    private void startAutoRefresh() {
-        int refreshInterval = BugReports.getInstance().getConfig().getInt("admin.auto-refresh", 30);
-        if (refreshInterval > 0) {
-            Bukkit.getScheduler().runTaskTimer(BugReports.getInstance(), this::init, 
-                refreshInterval * 20L, refreshInterval * 20L);
         }
     }
 } 

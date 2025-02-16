@@ -4,15 +4,12 @@ import com.beastmark.bugreports.BugReports;
 import com.beastmark.bugreports.gui.ReportCreationGUI;
 import com.beastmark.bugreports.gui.ReportStatusGUI;
 import com.beastmark.bugreports.gui.PlayerReportsGUI;
-import com.beastmark.bugreports.model.Report;
 import com.beastmark.bugreports.model.ReportType;
 import com.beastmark.bugreports.utils.MessageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.List;
 
 public class BugReportCommand implements CommandExecutor {
     private final BugReports plugin;

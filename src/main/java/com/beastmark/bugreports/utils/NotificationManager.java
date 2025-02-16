@@ -9,28 +9,58 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public class NotificationManager {
-    private static final Map<UUID, Set<Integer>> pendingNotifications = new HashMap<>();
-    private static final Map<UUID, List<String>> pendingMessages = new HashMap<>();
-    private static final Set<UUID> newReportsForAdmin = new HashSet<>();
+    private static final int MAX_MESSAGES_PER_PLAYER = 50;
+    private static final int MAX_NOTIFICATIONS_PER_PLAYER = 100;
+    private final Map<UUID, Set<Integer>> pendingNotifications = new HashMap<>();
+    private final Map<UUID, List<String>> pendingMessages = new HashMap<>();
     private final BugReports plugin;
 
     public NotificationManager(BugReports plugin) {
         this.plugin = plugin;
         startNotificationTask();
+        startCleanupTask();
+    }
+
+    private void startCleanupTask() {
+        // Очистка старых уведомлений каждый час
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            cleanupOldNotifications();
+        }, 20L * 3600L, 20L * 3600L);
+    }
+
+    private void cleanupOldNotifications() {
+        // Очищаем уведомления для оффлайн игроков, которые не заходили более 30 дней
+        long thirtyDaysAgo = System.currentTimeMillis() - (30L * 24L * 60L * 60L * 1000L);
+        
+        for (UUID playerId : new HashSet<>(pendingNotifications.keySet())) {
+            long lastSeen = Bukkit.getOfflinePlayer(playerId).getLastSeen();
+            if (lastSeen > 0 && lastSeen < thirtyDaysAgo) {
+                pendingNotifications.remove(playerId);
+                pendingMessages.remove(playerId);
+                plugin.getConfig().set("offline_notifications." + playerId.toString(), null);
+            }
+        }
+        plugin.saveConfig();
     }
 
     public void addNotification(UUID playerId, int reportId) {
         Report report = plugin.getDatabaseManager().getReport(reportId);
         if (report != null) {
-            pendingNotifications.computeIfAbsent(playerId, k -> new HashSet<>()).add(reportId);
+            Set<Integer> notifications = pendingNotifications.computeIfAbsent(playerId, k -> new HashSet<>());
+            
+            // Ограничиваем количество уведомлений
+            if (notifications.size() >= MAX_NOTIFICATIONS_PER_PLAYER) {
+                notifications.clear(); // Очищаем старые уведомления если достигнут лимит
+            }
+            
+            notifications.add(reportId);
             
             Player player = Bukkit.getPlayer(playerId);
             if (player != null && player.isOnline()) {
                 sendNotification(player);
+            } else {
+                saveOfflineNotification(playerId, reportId);
             }
-            
-            // Сохраняем уведомление для оффлайн игроков
-            saveOfflineNotification(playerId, reportId);
         }
     }
 
@@ -46,7 +76,14 @@ public class NotificationManager {
     }
 
     public void addMessageNotification(UUID playerId, String message) {
-        pendingMessages.computeIfAbsent(playerId, k -> new ArrayList<>()).add(message);
+        List<String> messages = pendingMessages.computeIfAbsent(playerId, k -> new ArrayList<>());
+        
+        // Ограничиваем количество сообщений
+        if (messages.size() >= MAX_MESSAGES_PER_PLAYER) {
+            messages.remove(0); // Удаляем самое старое сообщение
+        }
+        
+        messages.add(message);
         
         // Если игрок онлайн, сразу отправляем сообщение
         Player player = Bukkit.getPlayer(playerId);
@@ -56,7 +93,6 @@ public class NotificationManager {
     }
 
     public void sendNotification(Player player) {
-        // Отправляем обычные уведомления
         Set<Integer> reports = pendingNotifications.get(player.getUniqueId());
         if (reports != null && !reports.isEmpty()) {
             player.sendMessage(MessageManager.getMessage("report-updates-header"));
@@ -64,25 +100,17 @@ public class NotificationManager {
             for (int reportId : reports) {
                 Report report = plugin.getDatabaseManager().getReport(reportId);
                 if (report != null) {
-                    // Создаем кликабельное сообщение
-                    net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(
-                        MessageManager.getMessage("report-notification-format",
+                    net.kyori.adventure.text.TextComponent message = net.kyori.adventure.text.Component.text()
+                        .content(MessageManager.getMessage("report-notification-format",
                             "%id%", String.valueOf(reportId),
                             "%status%", report.getStatus(),
-                            "%type%", report.getType().name().equals("BUG") ? "Баг" : "Предложение")
-                    );
+                            "%type%", report.getType().name().equals("BUG") ? "Баг" : "Предложение"))
+                        .hoverEvent(net.kyori.adventure.text.event.HoverEvent.showText(
+                            net.kyori.adventure.text.Component.text(MessageManager.getMessage("click-to-view"))))
+                        .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/bugreport status"))
+                        .build();
                     
-                    message.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
-                        net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                        new net.md_5.bungee.api.chat.ComponentBuilder(MessageManager.getMessage("click-to-view"))
-                            .create()
-                    ));
-                    message.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
-                        net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
-                        "/bugreport status"
-                    ));
-                    
-                    player.spigot().sendMessage(message);
+                    player.sendMessage(message);
                 }
             }
             
@@ -90,7 +118,6 @@ public class NotificationManager {
             playNotificationSound(player);
         }
 
-        // Отправляем накопленные сообщения
         sendPendingMessages(player);
     }
 
@@ -124,8 +151,19 @@ public class NotificationManager {
     }
 
     private void saveOfflineNotification(UUID playerId, int reportId) {
-        // Можно добавить сохранение в базу данных для оффлайн игроков
-        // Или использовать файл для хранения
+        String path = "offline_notifications." + playerId.toString();
+        List<Integer> notifications = plugin.getConfig().getIntegerList(path);
+        
+        // Ограничиваем количество оффлайн уведомлений
+        if (notifications.size() >= MAX_NOTIFICATIONS_PER_PLAYER) {
+            notifications.clear();
+        }
+        
+        if (!notifications.contains(reportId)) {
+            notifications.add(reportId);
+            plugin.getConfig().set(path, notifications);
+            plugin.saveConfig();
+        }
     }
 
     private void sendPendingMessages(Player player) {

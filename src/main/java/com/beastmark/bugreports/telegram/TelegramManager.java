@@ -23,12 +23,12 @@ public class TelegramManager extends TelegramLongPollingBot {
     private final Map<Long, AdminSession> adminSessions = new HashMap<>();
 
     private static class AdminSession {
-        UUID minecraftUUID;
         String currentAction;
         Integer selectedReportId;
 
-        AdminSession(UUID minecraftUUID) {
-            this.minecraftUUID = minecraftUUID;
+        AdminSession() {
+            this.currentAction = null;
+            this.selectedReportId = null;
         }
     }
 
@@ -63,7 +63,7 @@ public class TelegramManager extends TelegramLongPollingBot {
                         String uuid = plugin.getConfig().getString("telegram.linked-accounts." + chatId);
                         // Создаем сессию для авторизованного пользователя
                         if (uuid != null) {
-                            adminSessions.put(chatId, new AdminSession(UUID.fromString(uuid)));
+                            adminSessions.put(chatId, new AdminSession());
                         }
                         sendMessage(chatId, "Ваш Telegram аккаунт уже привязан!\n" +
                             "Используйте следующие команды для управления:\n" +
@@ -93,7 +93,7 @@ public class TelegramManager extends TelegramLongPollingBot {
                 if (!adminSessions.containsKey(chatId)) {
                     String uuid = plugin.getConfig().getString("telegram.linked-accounts." + chatId);
                     if (uuid != null) {
-                        adminSessions.put(chatId, new AdminSession(UUID.fromString(uuid)));
+                        adminSessions.put(chatId, new AdminSession());
                     }
                 }
 
@@ -128,7 +128,7 @@ public class TelegramManager extends TelegramLongPollingBot {
         plugin.saveConfig();
         verificationCodes.remove(code);
 
-        adminSessions.put(chatId, new AdminSession(playerUUID));
+        adminSessions.put(chatId, new AdminSession());
         sendMessage(chatId, "Аккаунт успешно привязан! Теперь вы будете получать уведомления о новых репортах.");
         sendMainMenu(chatId);
     }

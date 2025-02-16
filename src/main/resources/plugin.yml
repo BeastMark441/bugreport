@@ -1,7 +1,7 @@
 name: BugReports
 version: '1.1.0'
 main: com.beastmark.bugreports.BugReports
-api-version: '1.19'
+api-version: '1.16'
 depend: [PlaceholderAPI]
 softdepend: []
 authors: [BeastMark]
@@ -37,6 +37,5 @@ permissions:
   bugreports.admin:
     description: Доступ к админ-командам
     default: op
-  bugreports.telegram:
-    description: Доступ к Telegram интеграции
-    default: op 
+    children:
+      bugreports.telegram: true 

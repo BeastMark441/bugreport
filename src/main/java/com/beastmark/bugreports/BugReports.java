@@ -22,8 +22,6 @@ import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -123,7 +121,7 @@ public class BugReports extends JavaPlugin {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
             File backupFile = new File(backupDir, fileName.replace(".yml", "") + "_" + timestamp + ".yml");
             
-            Files.copy(configFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            java.nio.file.Files.copy(configFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             getLogger().info("Создан бэкап файла " + fileName + ": " + backupFile.getName());
             
             // Удаляем старые бэкапы (оставляем только 5 последних)

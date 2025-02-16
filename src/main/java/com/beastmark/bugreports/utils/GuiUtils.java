@@ -13,13 +13,13 @@ public class GuiUtils {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+            meta.displayName(net.kyori.adventure.text.Component.text(ChatColor.translateAlternateColorCodes('&', name)));
             
-            List<String> loreList = new ArrayList<>();
+            List<net.kyori.adventure.text.Component> loreList = new ArrayList<>();
             for (String line : lore) {
-                loreList.add(ChatColor.translateAlternateColorCodes('&', line));
+                loreList.add(net.kyori.adventure.text.Component.text(ChatColor.translateAlternateColorCodes('&', line)));
             }
-            meta.setLore(loreList);
+            meta.lore(loreList);
             
             item.setItemMeta(meta);
         }

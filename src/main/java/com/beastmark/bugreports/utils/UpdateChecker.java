@@ -2,14 +2,16 @@ package com.beastmark.bugreports.utils;
 
 import com.beastmark.bugreports.BugReports;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.logging.Level;
 
@@ -38,7 +40,7 @@ public class UpdateChecker {
 
     public void checkForUpdates() {
         try {
-            URL url = new URL(GITHUB_API_URL);
+            URL url = URI.create(GITHUB_API_URL).toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
@@ -53,9 +55,8 @@ public class UpdateChecker {
                 }
                 reader.close();
 
-                // Извлекаем версию из JSON ответа
-                String jsonResponse = response.toString();
-                latestVersion = jsonResponse.split("\"tag_name\":\"")[1].split("\"")[0].replace("v", "");
+                JsonObject jsonResponse = new JsonParser().parse(response.toString()).getAsJsonObject();
+                latestVersion = jsonResponse.get("tag_name").getAsString().replace("v", "");
                 String currentVersion = plugin.getDescription().getVersion();
 
                 if (!currentVersion.equals(latestVersion)) {
@@ -64,12 +65,11 @@ public class UpdateChecker {
                         "§6Доступно обновление BugReports!\n" +
                         "§7Текущая версия: §f" + currentVersion + "\n" +
                         "§7Новая версия: §f" + latestVersion + "\n" +
-                        "§7Скачать: §fhttps://github.com/BeastMark441/bugreport/releases/latest\n" +
+                        "§7Скачать: §f" + jsonResponse.get("html_url").getAsString() + "\n" +
                         "§8§m                                                    §r";
                     
                     plugin.getLogger().info("Доступно обновление! Текущая версия: " + currentVersion + ", Новая версия: " + latestVersion);
                     
-                    // Отправляем сообщение всем админам онлайн
                     if (plugin.getConfig().getBoolean("updates.notify-admins", true)) {
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             if (player.hasPermission("bugreports.admin")) {

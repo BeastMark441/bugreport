@@ -6,7 +6,6 @@ import com.beastmark.bugreports.model.ReportType;
 
 import java.io.File;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -64,6 +63,7 @@ public class SQLiteManager implements DatabaseManager {
 
     @Override
     public void saveReport(Report report) {
+        checkConnection();
         String sql = "INSERT INTO reports (player_uuid, player_name, category, description, status, created_at, type) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?)";
                      
@@ -90,6 +90,7 @@ public class SQLiteManager implements DatabaseManager {
 
     @Override
     public void deleteReport(int id) {
+        checkConnection();
         try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM reports WHERE id = ?")) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
@@ -100,16 +101,38 @@ public class SQLiteManager implements DatabaseManager {
 
     @Override
     public void deleteAllReports() {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("DELETE FROM reports");
-            plugin.getLogger().info("Все репорты были успешно удалены");
+        checkConnection();
+        try {
+            connection.setAutoCommit(false);
+            try (Statement stmt = connection.createStatement()) {
+                stmt.executeUpdate("DELETE FROM reports");
+                connection.commit();
+                plugin.getLogger().info("Все репорты были успешно удалены");
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             plugin.getLogger().severe("Ошибка удаления всех репортов: " + e.getMessage());
         }
     }
 
+    private void checkConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                init();
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Ошибка проверки соединения с базой данных: " + e.getMessage());
+            init();
+        }
+    }
+
     @Override
     public void updateReportStatus(int id, String status) {
+        checkConnection();
         try (PreparedStatement stmt = connection.prepareStatement("UPDATE reports SET status = ? WHERE id = ?")) {
             stmt.setString(1, status);
             stmt.setInt(2, id);
@@ -121,6 +144,7 @@ public class SQLiteManager implements DatabaseManager {
 
     @Override
     public Report getReport(int id) {
+        checkConnection();
         try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM reports WHERE id = ?")) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -149,6 +173,7 @@ public class SQLiteManager implements DatabaseManager {
 
     @Override
     public List<Report> getPlayerReports(UUID playerId) {
+        checkConnection();
         List<Report> reports = new ArrayList<>();
         String sql = "SELECT * FROM reports WHERE player_uuid = ?";
         
@@ -168,6 +193,7 @@ public class SQLiteManager implements DatabaseManager {
 
     @Override
     public List<Report> getAllReports() {
+        checkConnection();
         List<Report> reports = new ArrayList<>();
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM reports ORDER BY created_at DESC")) {

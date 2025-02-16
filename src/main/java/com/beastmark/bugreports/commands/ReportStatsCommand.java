@@ -9,10 +9,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class ReportStatsCommand implements CommandExecutor {
-    private final BugReports plugin;
 
     public ReportStatsCommand(BugReports plugin) {
-        this.plugin = plugin;
+        // Конструктор не требует дополнительной инициализации
     }
 
     @Override
