@@ -159,16 +159,16 @@ public class SQLiteManager implements DatabaseManager {
     }
 
     private Report createReportFromResultSet(ResultSet rs) throws SQLException {
-        Report report = new Report(
+        return new Report(
             UUID.fromString(rs.getString("player_uuid")),
             rs.getString("player_name"),
             rs.getString("category"),
             rs.getString("description"),
-            ReportType.valueOf(rs.getString("type"))
+            ReportType.valueOf(rs.getString("type")),
+            rs.getString("status"),
+            rs.getTimestamp("created_at").toLocalDateTime(),
+            rs.getInt("id")
         );
-        report.setId(rs.getInt("id"));
-        report.setStatus(rs.getString("status"));
-        return report;
     }
 
     @Override
@@ -281,5 +281,23 @@ public class SQLiteManager implements DatabaseManager {
             plugin.getLogger().severe("Ошибка получения черного списка: " + e.getMessage());
         }
         return blacklist;
+    }
+
+    @Override
+    public Report getLatestReport() {
+        checkConnection();
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "SELECT * FROM reports ORDER BY id DESC LIMIT 1")) {
+            
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Report report = createReportFromResultSet(rs);
+                report.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                return report;
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Ошибка при получении последнего репорта: " + e.getMessage());
+        }
+        return null;
     }
 } 

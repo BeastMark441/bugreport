@@ -19,27 +19,29 @@ public class MessageManager {
         // Сохраняем дефолтный файл, если его нет
         if (!file.exists()) {
             BugReports.getInstance().saveResource("messages.yml", false);
-        } else {
-            // Проверяем и добавляем новые сообщения
-            FileConfiguration defaultMessages = YamlConfiguration.loadConfiguration(
-                new InputStreamReader(BugReports.getInstance().getResource("messages.yml")));
-            messages = YamlConfiguration.loadConfiguration(file);
-            
-            boolean needsSave = false;
-            for (String key : defaultMessages.getKeys(true)) {
-                if (!messages.contains(key)) {
-                    messages.set(key, defaultMessages.get(key));
-                    needsSave = true;
-                }
+        }
+        
+        // Загружаем файл сообщений
+        messages = YamlConfiguration.loadConfiguration(file);
+        
+        // Проверяем и добавляем новые сообщения
+        FileConfiguration defaultMessages = YamlConfiguration.loadConfiguration(
+            new InputStreamReader(BugReports.getInstance().getResource("messages.yml")));
+        
+        boolean needsSave = false;
+        for (String key : defaultMessages.getKeys(true)) {
+            if (!messages.contains(key)) {
+                messages.set(key, defaultMessages.get(key));
+                needsSave = true;
             }
-            
-            if (needsSave) {
-                try {
-                    messages.save(file);
-                    BugReports.getInstance().getLogger().info("Файл messages.yml обновлен новыми сообщениями");
-                } catch (IOException e) {
-                    BugReports.getInstance().getLogger().severe("Ошибка при сохранении messages.yml: " + e.getMessage());
-                }
+        }
+        
+        if (needsSave) {
+            try {
+                messages.save(file);
+                BugReports.getInstance().getLogger().info("Файл messages.yml обновлен новыми сообщениями");
+            } catch (IOException e) {
+                BugReports.getInstance().getLogger().severe("Ошибка при сохранении messages.yml: " + e.getMessage());
             }
         }
         

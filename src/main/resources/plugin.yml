@@ -1,5 +1,5 @@
 name: BugReports
-version: '1.1.0'
+version: '1.1.1'
 main: com.beastmark.bugreports.BugReports
 api-version: '1.16'
 depend: [PlaceholderAPI]

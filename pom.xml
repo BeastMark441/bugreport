@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.beastmark</groupId>
-    <artifactId>bugreports</artifactId>
-    <version>1.1.0</version>
+    <artifactId>BugReports</artifactId>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
 
     <name>BugReports</name>

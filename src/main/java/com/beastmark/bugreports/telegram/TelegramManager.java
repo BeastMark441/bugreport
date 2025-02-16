@@ -478,9 +478,6 @@ public class TelegramManager extends TelegramLongPollingBot {
         // Сохраняем сообщение для игрока (будет показано при входе)
         plugin.getNotificationManager().addMessageNotification(report.getPlayerUUID(), message);
         
-        // Пытаемся отправить сообщение сразу, если игрок онлайн
-        plugin.getNotificationManager().sendMessageToPlayer(report.getPlayerUUID(), message);
-        
         sendMessage(chatId, "Сообщение отправлено игроку " + report.getPlayerName());
         sendReportDetails(chatId, reportId);
     }

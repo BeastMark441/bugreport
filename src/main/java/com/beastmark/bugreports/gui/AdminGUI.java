@@ -145,6 +145,7 @@ public class AdminGUI extends GUI {
     }
 
     private String formatDescription(String description) {
+        if (description == null) return "";
         if (description.length() > 30) {
             return description.substring(0, 27) + "...";
         }
@@ -213,10 +214,6 @@ public class AdminGUI extends GUI {
         return statuses;
     }
 
-    private String formatStatusList(List<String> statuses) {
-        return String.join(", ", statuses);
-    }
-
     @Override
     public void handleClick(InventoryClickEvent event) {
         // Применяем базовую защиту от перемещения предметов
@@ -233,8 +230,6 @@ public class AdminGUI extends GUI {
             } else if (event.isRightClick()) {
                 currentFilter = statuses.get((currentIndex - 1 + statuses.size()) % statuses.size());
             }
-            player.sendMessage(MessageManager.getMessage("invalid-status", 
-                "%statuses%", formatStatusList(BugReports.getInstance().getConfig().getStringList("statuses"))));
             init();
         }
         else if (slot == 47) { // Сортировка

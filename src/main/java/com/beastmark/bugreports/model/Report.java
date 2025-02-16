@@ -23,6 +23,18 @@ public class Report {
         this.createdAt = LocalDateTime.now();
     }
 
+    public Report(UUID playerUUID, String playerName, String category, String description, 
+                 ReportType type, String status, LocalDateTime createdAt, int id) {
+        this.playerUUID = playerUUID;
+        this.playerName = playerName;
+        this.category = category;
+        this.description = description;
+        this.type = type;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.id = id;
+    }
+
     // Геттеры
     public int getId() { return id; }
     public UUID getPlayerUUID() { return playerUUID; }

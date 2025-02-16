@@ -4,6 +4,7 @@ import com.beastmark.bugreports.model.Report;
 import java.util.List;
 import java.util.UUID;
 
+
 public interface DatabaseManager {
     void init();
     void close();
@@ -30,4 +31,6 @@ public interface DatabaseManager {
             .anyMatch(report -> report.getStatus().equals("Новый") || 
                               report.getStatus().equals("В обработке"));
     }
+
+    Report getLatestReport();
 } 

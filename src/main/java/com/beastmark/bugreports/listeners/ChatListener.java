@@ -5,11 +5,14 @@ import com.beastmark.bugreports.model.Report;
 import com.beastmark.bugreports.utils.MessageManager;
 import com.beastmark.bugreports.utils.ReportCreationManager;
 import com.beastmark.bugreports.utils.ReportCreationManager.ReportCreationState;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import io.papermc.paper.event.player.AsyncChatEvent;
+
 
 public class ChatListener implements Listener {
     private final BugReports plugin;
@@ -28,7 +31,13 @@ public class ChatListener implements Listener {
         }
 
         event.setCancelled(true);
-        String description = event.message().toString();
+        Component message = event.message();
+        String description;
+        if (message instanceof TextComponent) {
+            description = ((TextComponent) message).content();
+        } else {
+            description = message.toString();
+        }
 
         if (description.equalsIgnoreCase("cancel")) {
             ReportCreationManager.removePlayerState(player);
@@ -51,6 +60,7 @@ public class ChatListener implements Listener {
             return;
         }
 
+        // Создаем репорт
         Report report = new Report(
             player.getUniqueId(),
             player.getName(),
@@ -58,18 +68,14 @@ public class ChatListener implements Listener {
             description,
             state.type
         );
-
+        
         plugin.getDatabaseManager().saveReport(report);
         ReportCreationManager.removePlayerState(player);
         
         player.sendMessage(MessageManager.getMessage("report-created", 
             "%id%", String.valueOf(report.getId())));
 
-        if (plugin.getTelegramManager() != null && 
-            plugin.getConfig().getBoolean("telegram.notifications.new-reports", true)) {
-            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                plugin.getTelegramManager().notifyAdminsNewReport(report);
-            });
-        }
+        // Уведомляем администраторов
+        plugin.getNotificationManager().addAdminNotification();
     }
 } 

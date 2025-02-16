@@ -85,7 +85,7 @@ updates:
 
 # Настройки Telegram
 telegram:
-  # Включить/выключить интеграцию с Telegram
+  # Включить/выключить интеграцию с Telegram (требуется перезагрузка сервера)
   enabled: false
   # Токен бота (получите у @BotFather)
   bot-token: ""

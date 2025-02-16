@@ -73,6 +73,17 @@ public class NotificationManager {
                     playNotificationSound(admin);
                 });
         }
+
+        // Отправляем уведомление в Telegram
+        if (plugin.getTelegramManager() != null && 
+            plugin.getConfig().getBoolean("telegram.notifications.new-reports", true)) {
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                Report report = plugin.getDatabaseManager().getLatestReport();
+                if (report != null) {
+                    plugin.getTelegramManager().notifyAdminsNewReport(report);
+                }
+            });
+        }
     }
 
     public void addMessageNotification(UUID playerId, String message) {

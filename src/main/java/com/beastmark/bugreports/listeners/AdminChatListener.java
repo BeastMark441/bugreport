@@ -1,5 +1,6 @@
 package com.beastmark.bugreports.listeners;
 
+import com.beastmark.bugreports.BugReports;
 import com.beastmark.bugreports.utils.MessageManager;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -7,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import net.kyori.adventure.text.TextComponent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +28,13 @@ public class AdminChatListener implements Listener {
 
         if (target != null) {
             event.setCancelled(true);
-            String message = event.message().toString();
+            String message;
+            
+            if (event.message() instanceof TextComponent textComponent) {
+                message = textComponent.content();
+            } else {
+                message = event.message().toString().replaceAll("TextComponent\\{.*content=(.+)\\}", "$1");
+            }
 
             if (message.equalsIgnoreCase("cancel")) {
                 playersInMessageMode.remove(admin.getUniqueId());
@@ -37,7 +45,9 @@ public class AdminChatListener implements Listener {
             // Отправляем сообщение игроку
             String prefix = MessageManager.getRawMessage("prefix");
             String coloredMessage = ChatColor.translateAlternateColorCodes('&', "&f" + message);
-            target.sendMessage(prefix + " " + coloredMessage);
+            
+            // Добавляем уведомление через NotificationManager
+            BugReports.getInstance().getNotificationManager().addMessageNotification(target.getUniqueId(), prefix + " " + coloredMessage);
             
             admin.sendMessage(MessageManager.getMessage("message-sent", 
                 "%player%", target.getName()));
